@@ -93,6 +93,7 @@ namespace SoulsText.Repositories
                              WHERE Id = @id";
 
                     DbUtils.AddParameter(cmd, "@id", profile.Id);
+                    DbUtils.AddParameter(cmd, "@userName", profile.UserName);
 
                     cmd.ExecuteNonQuery();
                 }

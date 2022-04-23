@@ -55,6 +55,17 @@ namespace SoulsText.Utils
         }
 
         /// <summary>
+        /// Get an boolean from a data reader object.
+        /// </summary>
+        /// <param name="reader">A SqlDataReader that has not exhausted its result set</param>
+        /// <param name="column">The name of the column from the result set referenced to by the reader</param>
+        /// <returns>The value of the given column.</returns>
+        public static bool GetBool(SqlDataReader reader, string column)
+        {
+            return reader.GetBoolean(reader.GetOrdinal(column));
+        }
+
+        /// <summary>
         ///  Determine if the value a given column is NULL
         /// </summary>
         /// <param name="reader">A SqlDataReader that has not exhausted its result set.</param>

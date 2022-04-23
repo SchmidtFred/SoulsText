@@ -1,4 +1,5 @@
-﻿
+﻿using System.Collections.Generic;
+
 namespace SoulsText.Models
 {
     public class Message
@@ -10,5 +11,7 @@ namespace SoulsText.Models
         public float Z { get; set; }
         public int UserProfileId { get; set; }
         public UserProfile UserProfile { get; set; }
+        public List<Vote> Votes { get; set; }
+        public int VoteCount { get; set; }
     }
 }
