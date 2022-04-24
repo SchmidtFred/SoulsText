@@ -7,7 +7,7 @@ using SoulsText.Models;
 
 namespace SoulsText.Repositories
 {
-    public class MessageRepository : BaseRepository
+    public class MessageRepository : BaseRepository, IMessageRepository
     {
         public MessageRepository(IConfiguration configuration) : base(configuration) { }
 
@@ -21,7 +21,7 @@ namespace SoulsText.Repositories
                     cmd.CommandText = MessageQuery;
 
                     var messages = new List<Message>();
-                    
+
                     var reader = cmd.ExecuteReader();
                     while (reader.Read())
                     {
@@ -33,13 +33,18 @@ namespace SoulsText.Repositories
                             existingMessage = MessageFromReader(reader);
                             existingMessage.UserProfile = ProfileFromReader(reader);
                             existingMessage.Votes = new List<Vote>();
+
+                            messages.Add(existingMessage);
                         }
 
                         if (DbUtils.IsNotDbNull(reader, "VoteId"))
                         {
                             existingMessage.Votes.Add(VoteFromReader(reader));
                         }
+
                     }
+
+                    reader.Close();
 
                     return messages;
                 }
@@ -53,7 +58,7 @@ namespace SoulsText.Repositories
                 conn.Open();
                 using (var cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = MessageQuery + "WHERE m.Id = @id";
+                    cmd.CommandText = MessageQuery + " WHERE m.Id = @id";
 
                     DbUtils.AddParameter(cmd, "@id", id);
 
@@ -75,13 +80,15 @@ namespace SoulsText.Repositories
                         }
                     }
 
+                    reader.Close();
+
                     return message;
                 }
             }
         }
 
         public void Add(Message message)
-        { 
+        {
             using (var conn = Connection)
             {
                 conn.Open();
@@ -100,7 +107,7 @@ namespace SoulsText.Repositories
 
                     message.Id = (int)cmd.ExecuteScalar();
                 }
-            }    
+            }
         }
 
         public void Update(Message message)
@@ -166,20 +173,21 @@ namespace SoulsText.Repositories
         /// <param name="reader">A SqlDataReader that has not exhausted it's result set</param>
         /// <returns>A Message object.</returns>
         private Message MessageFromReader(SqlDataReader reader)
-        { 
+        {
             return new Message()
             {
                 Id = DbUtils.GetInt(reader, "MessageId"),
                 Content = DbUtils.GetString(reader, "Content"),
-                X = DbUtils.GetInt(reader, "X"),
-                Y = DbUtils.GetInt(reader, "Y"),
-                Z = DbUtils.GetInt(reader, "Z"),
+                X = DbUtils.GetFloat(reader, "X"),
+                Y = DbUtils.GetFloat(reader, "Y"),
+                Z = DbUtils.GetFloat(reader, "Z"),
                 UserProfileId = DbUtils.GetInt(reader, "MessageUserId"),
             };
         }
 
         /// <summary>
         /// Get a UserProfile object from a data reader object.
+        /// This method is specifically for use in MessageRepository.
         /// </summary>
         /// <param name="reader">A SqlDataReader that has not exhausted it's result set</param>
         /// <returns>A UserProfile object.</returns>
@@ -193,7 +201,8 @@ namespace SoulsText.Repositories
         }
 
         /// <summary>
-        /// Get a Vote object from a data reader object.
+        /// Get a Vote object from a data reader object. 
+        /// This method is specifially for use in MessageRepository.
         /// </summary>
         /// <param name="reader">A SqlDataReader that has not exhausted it's result set</param>
         /// <returns>A Vote object.</returns>

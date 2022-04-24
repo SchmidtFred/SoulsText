@@ -9,7 +9,7 @@ namespace SoulsText.Repositories
 
         public BaseRepository(IConfiguration configuration)
         {
-            _connectionString = configuration.GetConnectionString("Default Connection");
+            _connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
         protected SqlConnection Connection
