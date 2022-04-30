@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using SoulsText.Hubs;
 using SoulsText.Models;
 using SoulsText.Repositories;
+using System.Threading.Tasks;
 
 namespace SoulsText.Controllers
 {
@@ -9,10 +12,12 @@ namespace SoulsText.Controllers
     public class MessageController : Controller
     {
         private readonly IMessageRepository _messageRepository;
+        private readonly IHubContext<SoulsHub> _hubContext;
 
-        public MessageController(IMessageRepository messageRepository)
+        public MessageController(IMessageRepository messageRepository, IHubContext<SoulsHub> hubContext)
         {
             _messageRepository = messageRepository;
+            _hubContext = hubContext;
         }
 
         [HttpGet]
@@ -32,10 +37,18 @@ namespace SoulsText.Controllers
             return Json(message);
         }
 
+        //[HttpPost]
+        //public JsonResult Post(Message message)
+        //{
+        //    _messageRepository.Add(message);
+        //    return Json(message);
+        //}
+
         [HttpPost]
-        public JsonResult Post(Message message)
+        public async Task<JsonResult> Post([FromBody] Message message)
         {
             _messageRepository.Add(message);
+            await _hubContext.Clients.All.SendAsync("ReceiveMessage", message);
             return Json(message);
         }
 

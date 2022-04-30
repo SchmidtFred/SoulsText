@@ -8,9 +8,9 @@ GO
 USE [SoulsText]
 GO
 
-DROP TABLE IF EXISTS UserProfile;
-DROP TABLE IF EXISTS [Message];
 DROP TABLE IF EXISTS Vote;
+DROP TABLE IF EXISTS [Message];
+DROP TABLE IF EXISTS UserProfile;
 GO
 
 CREATE TABLE UserProfile (

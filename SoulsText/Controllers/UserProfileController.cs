@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using SoulsText.Hubs;
 using SoulsText.Models;
 using SoulsText.Repositories;
 

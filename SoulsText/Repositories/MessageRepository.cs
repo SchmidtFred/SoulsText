@@ -45,6 +45,8 @@ namespace SoulsText.Repositories
                     }
 
                     reader.Close();
+                    //set vote counts
+                    messages.ForEach(m => SetVoteCount(m));
 
                     return messages;
                 }
@@ -81,6 +83,9 @@ namespace SoulsText.Repositories
                     }
 
                     reader.Close();
+
+                    //make sure we set the vote count
+                   SetVoteCount(message);
 
                     return message;
                 }
@@ -215,6 +220,22 @@ namespace SoulsText.Repositories
                 UserProfileId = DbUtils.GetNullableInt(reader, "VoteUserId"),
                 MessageId = DbUtils.GetInt(reader, "MessageId")
             };
+        }
+
+        /// <summary>
+        /// Set the VoteCount property for a message when it is retrieved 
+        /// This method is specifially for use in MessageRepository.
+        /// </summary>
+        /// <param name="message">A Message object that has not had its VoteCount property set</param>
+        private void SetVoteCount(Message message)
+        {
+            message.Votes.ForEach(v =>
+            {
+                if (v.Upvote)
+                {
+                    message.VoteCount++;
+                }
+            });
         }
     }
 }
