@@ -58,7 +58,11 @@ namespace SoulsText.ConsoleApp.UserInterfaceManagers
 
         private void ListUsers()
         {
-            Console.WriteLine("Not Implemented Yet");
+            Console.WriteLine("All Users");
+            _data.Users.ForEach(user => Console.WriteLine($" ID: {user.Id} - {user.UserName}"));
+            Console.WriteLine("Press any key to return to User Menu");
+            Console.ReadLine();
+            return this;
         }
     }
 }
