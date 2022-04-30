@@ -12,11 +12,12 @@ namespace SoulsText.ConsoleApp
     {
         public static InMemoryData Data = new InMemoryData();
         public static HubConnection Connection = CreateConnection.ConfigureConnection().Result;
+        
+        //putting this here for access from connection to track what module is in use for automatic refreshes
+        public static IUserInterfaceManager ui = new LoginManager();
 
         static void Main(string[] args)
-        {
-            
-            IUserInterfaceManager ui = new LoginManager();
+        {           
             while (ui != null)
             {
                 //Each call to Execute will return the next IUserInterfaceManager that we should execute.

@@ -14,6 +14,8 @@ namespace SoulsText.ConsoleApp.UserInterfaceManagers
         private readonly string _apiUrl;
         private readonly HubConnection _connection;
         private readonly InMemoryData _data;
+        private string _state { get; set; }
+        public string State { get { return _state; } }
 
         public UserProfileManager(IUserInterfaceManager parentUI, string apiUrl)
         {
@@ -53,15 +55,12 @@ namespace SoulsText.ConsoleApp.UserInterfaceManagers
         {
             Console.WriteLine($"ID - {_data.User.Id}");
             Console.WriteLine($"UserName - {_data.User.UserName}");
-            Console.ReadLine();
         }
 
         private void ListUsers()
         {
             Console.WriteLine("All Users");
             _data.Users.ForEach(user => Console.WriteLine($" ID: {user.Id} - {user.UserName}"));
-            Console.WriteLine("Press any key to return to User Menu");
-            Console.ReadLine();
         }
     }
 }

@@ -25,14 +25,14 @@ namespace SoulsText.ConsoleApp
             //Add new user to Data and write a notification that someone else has connected
             connection.On<UserProfile>("NewUser", profile =>
             {
-                if (Program.Data.Users.Contains(profile))
+                if (Program.Data.Users.Any(p => p.Id == profile.Id))
                 {
                     Console.WriteLine($"{profile.UserName} has logged on.");
                 }
                 else
                 {
                     Program.Data.Users.Add(profile);
-                    Console.WriteLine($"{profile.UserName} ");
+                    Console.WriteLine($"New User {profile.UserName} has registered with SoulsText.");
                 }
             });
 
