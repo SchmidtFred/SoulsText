@@ -22,5 +22,6 @@ namespace SoulsText
                 {
                     webBuilder.UseStartup<Startup>();
                 });
+
     }
 }
