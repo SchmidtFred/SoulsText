@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using SoulsText.Models;
 using SoulsText.Repositories;
+using Microsoft.AspNetCore.Mvc;
 
 namespace SoulsText.Hubs
 {
@@ -22,21 +23,31 @@ namespace SoulsText.Hubs
         public override async Task OnConnectedAsync()
         {
             //make sure the connected user recieves all messages upon connection
+            var profiles = _userProfileRepository.GetAll();
+            await Clients.Caller.SendAsync("ReceiveAllUsers", profiles);
+            await base.OnConnectedAsync();
+        }
+
+        public async Task UserLoggedIn(UserProfile profile)
+        {
+            //now that user is logged in, they recieve all messages
             var messages = _messageRepository.GetAll();
             await Clients.Caller.SendAsync("ReceiveAllMessages", messages);
-            await base.OnConnectedAsync();
+            //to ping other users that new user has logged in (stretch goal)
+            await Clients.Others.SendAsync("NewUser", profile);
         }
 
         public async Task SendMessage(Message message)
         {
             _messageRepository.Add(message);
-            await Clients.All.SendAsync("ReceiveMessage", message);
+            await Clients.All.SendAsync("ReceiveNewMessage", message);
         }
 
         public async Task RegisterUser(UserProfile user)
         {
             _userProfileRepository.Add(user);
-            await Clients.All.SendAsync("NewUser", user);
+            await Clients.Others.SendAsync("NewUser", user);
+            await Clients.Caller.SendAsync("UserRegistered", user);
         }
 
 
@@ -45,7 +56,7 @@ namespace SoulsText.Hubs
         {
             _voteRepository.Add(vote);
             var message = _messageRepository.GetById(vote.MessageId);
-            await Clients.All.SendAsync("ReceiveMessage", message);
+            await Clients.All.SendAsync("ReceiveUpdatedMessage", message);
         }
     }
 }

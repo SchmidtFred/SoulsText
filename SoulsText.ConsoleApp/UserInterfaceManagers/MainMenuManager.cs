@@ -1,26 +1,29 @@
 ﻿using System;
 using SoulsText.ConsoleApp.UserInterfaceManagers;
 using SoulsText.ConsoleApp.Models;
+using Microsoft.AspNetCore.SignalR.Client;
 
 namespace SoulsText.ConsoleApp.UserInterfaceManagers
 {
     public class MainMenuManager : IUserInterfaceManager
     {
         private const string API_URL = @"https://localhost:5001/api";
-        private UserProfile _user;
+        private readonly InMemoryData _data;
+        private readonly HubConnection _connection;
 
-        public MainMenuManager(UserProfile user = null)
+        public MainMenuManager()
         {
-            _user = user;
+            _data = Program.Data;
+            _connection = Program.Connection;
         }
 
         public IUserInterfaceManager Execute()
         {
-            Console.WriteLine("Welcome to the Souls Text Console App.");
+            if (_data.User != null)
+            { 
+                Console.WriteLine($"Welcome to the Souls Text Console App.");
 
-            if (_user != null)
-            {
-                Console.WriteLine($"{_user.UserName} - Main Menu");
+                Console.WriteLine($"{_data.User.UserName} - Main Menu");
 
                 Console.WriteLine(" 1) User Details");
                 Console.WriteLine(" 2) Messages");
@@ -31,7 +34,7 @@ namespace SoulsText.ConsoleApp.UserInterfaceManagers
                 switch (choice)
                 {
                     case "1":
-                        return new UserProfileManager(this, API_URL, _user);
+                        return new UserProfileManager(this, API_URL);
                     case "2":
                         Console.WriteLine("Not implemented");
                         return this;
@@ -45,7 +48,8 @@ namespace SoulsText.ConsoleApp.UserInterfaceManagers
             }
             else
             {
-                return new LoginManager(API_URL);
+                Console.WriteLine("Something went wrong, please login again.");
+                return new LoginManager();
             }
         }
     }

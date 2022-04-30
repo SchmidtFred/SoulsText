@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using SoulsText.ConsoleApp.UserInterfaceManagers;
 using SoulsText.ConsoleApp.Models;
+using Microsoft.AspNetCore.SignalR.Client;
 
 namespace SoulsText.ConsoleApp.UserInterfaceManagers
 {
@@ -11,13 +12,17 @@ namespace SoulsText.ConsoleApp.UserInterfaceManagers
     {
         private readonly IUserInterfaceManager _parentUI;
         private readonly string _apiUrl;
-        private readonly UserProfile _userProfile;
+        private readonly HubConnection _connection;
+        private readonly InMemoryData _data;
+        private string _state { get; set; }
+        public string State { get { return _state; } }
 
-        public UserProfileManager(IUserInterfaceManager parentUI, string apiUrl, UserProfile userProfile)
+        public UserProfileManager(IUserInterfaceManager parentUI, string apiUrl)
         {
             _parentUI = parentUI;
             _apiUrl = apiUrl;
-            _userProfile = userProfile;
+            _connection = Program.Connection;
+            _data = Program.Data;
         }
 
         public IUserInterfaceManager Execute()
@@ -48,14 +53,14 @@ namespace SoulsText.ConsoleApp.UserInterfaceManagers
 
         private void UserInfo()
         {
-            Console.WriteLine($"ID - {_userProfile.Id}");
-            Console.WriteLine($"UserName - {_userProfile.Name}");
-            Console.ReadLine();
+            Console.WriteLine($"ID - {_data.User.Id}");
+            Console.WriteLine($"UserName - {_data.User.UserName}");
         }
 
         private void ListUsers()
         {
-            Console.WriteLine("Not Implemented Yet");
+            Console.WriteLine("All Users");
+            _data.Users.ForEach(user => Console.WriteLine($" ID: {user.Id} - {user.UserName}"));
         }
     }
 }
