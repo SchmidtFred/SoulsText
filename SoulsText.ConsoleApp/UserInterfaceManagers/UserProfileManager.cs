@@ -62,7 +62,6 @@ namespace SoulsText.ConsoleApp.UserInterfaceManagers
             _data.Users.ForEach(user => Console.WriteLine($" ID: {user.Id} - {user.UserName}"));
             Console.WriteLine("Press any key to return to User Menu");
             Console.ReadLine();
-            return this;
         }
     }
 }
