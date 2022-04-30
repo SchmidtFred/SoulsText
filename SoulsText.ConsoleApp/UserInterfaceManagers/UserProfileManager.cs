@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using SoulsText.ConsoleApp.UserInterfaceManagers;
 using SoulsText.ConsoleApp.Models;
+using Microsoft.AspNetCore.SignalR.Client;
 
 namespace SoulsText.ConsoleApp.UserInterfaceManagers
 {
@@ -11,13 +12,15 @@ namespace SoulsText.ConsoleApp.UserInterfaceManagers
     {
         private readonly IUserInterfaceManager _parentUI;
         private readonly string _apiUrl;
-        private readonly UserProfile _userProfile;
+        private readonly HubConnection _connection;
+        private readonly InMemoryData _data;
 
-        public UserProfileManager(IUserInterfaceManager parentUI, string apiUrl, UserProfile userProfile)
+        public UserProfileManager(IUserInterfaceManager parentUI, string apiUrl)
         {
             _parentUI = parentUI;
             _apiUrl = apiUrl;
-            _userProfile = userProfile;
+            _connection = Program.Connection;
+            _data = Program.Data;
         }
 
         public IUserInterfaceManager Execute()
@@ -48,8 +51,8 @@ namespace SoulsText.ConsoleApp.UserInterfaceManagers
 
         private void UserInfo()
         {
-            Console.WriteLine($"ID - {_userProfile.Id}");
-            Console.WriteLine($"UserName - {_userProfile.Name}");
+            Console.WriteLine($"ID - {_data.User.Id}");
+            Console.WriteLine($"UserName - {_data.User.UserName}");
             Console.ReadLine();
         }
 
