@@ -14,8 +14,7 @@ namespace SoulsText.ConsoleApp.UserInterfaceManagers
         private readonly string _apiUrl;
         private readonly HubConnection _connection;
         private readonly InMemoryData _data;
-        private string _state { get; set; }
-        public string State { get { return _state; } }
+        public IUserInterfaceManager ParentUi { get { return _parentUI; } }
 
         public UserProfileManager(IUserInterfaceManager parentUI, string apiUrl)
         {

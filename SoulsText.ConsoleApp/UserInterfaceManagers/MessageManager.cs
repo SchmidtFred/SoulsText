@@ -3,46 +3,53 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.SignalR.Client;
 using SoulsText.ConsoleApp.Models;
 
 namespace SoulsText.ConsoleApp.UserInterfaceManagers
 {
     internal class MessageManager : IUserInterfaceManager
     {
-        private readonly IUserInterfaceManager _parentUI;
-        private readonly string _apiUrl;
-        private readonly UserProfile _userProfile;
+        private readonly IUserInterfaceManager _parentUi;
+        private readonly HubConnection _connection;
+        private readonly InMemoryData _data;
+        public IUserInterfaceManager ParentUi { get { return _parentUi; } }
 
-        public MessageManager(IUserInterfaceManager parentUI, string apiUrl, UserProfile userProfile)
+        public MessageManager(IUserInterfaceManager parentUI)
         {
-            _parentUI = parentUI;
-            _apiUrl = apiUrl;
-            _userProfile = userProfile;
+            _parentUi = parentUI;
+            _connection = Program.Connection;
+            _data = Program.Data;
         }
 
         public IUserInterfaceManager Execute()
         {
-            Console.WriteLine("Message Menu");
-            Console.WriteLine(" 1) View All Messages");
-            Console.WriteLine(" 2) Get Message By Id");
-            Console.WriteLine(" 0) Go Back");
+            Console.Clear();
+            Console.WriteLine("Messages");
+            _data.Messages.ForEach(message => Console.WriteLine($" ID: {message.Id} - {message.Content}"));
+            Console.WriteLine(" Enter Id Details. 0 or Empty Selection will take you back.");
 
             Console.Write("> ");
             string choice = Console.ReadLine();
-            switch (choice)
+            if (choice == "0" || string.IsNullOrEmpty(choice))
             {
-                case "1":
-                    List();
-                    return this;
-                case "2":
-                    Choose();
-                    return this;
-                case "0":
-                    return _parentUI;
-                default:
-                    Console.WriteLine("Invalid Selection");
-                    return this;
-
+                return _parentUi;
+            }
+            if (int.TryParse(choice, out int id))
+            {
+                var chosenMessage = _data.Messages.FirstOrDefault(message => message.Id == id);
+                if (chosenMessage == null)
+                {
+                    Console.WriteLine("Message does not exist");
+                    return _parentUi;
+                }
+                return new MessageDetailManager(this, chosenMessage);
+            }
+            else
+            {
+                //go back to main menu to retry
+                Console.WriteLine("Invalid Option");
+                return _parentUi;
             }
         }
 
