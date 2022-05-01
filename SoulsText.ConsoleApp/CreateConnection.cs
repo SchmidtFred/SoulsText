@@ -47,7 +47,11 @@ namespace SoulsText.ConsoleApp
             {
                 //update data
                 Program.Data.Messages.Add(message);
-                Console.WriteLine($"New Message Placed - {message.Content}");
+                //only show notification if it is not your message
+                if (message.UserProfileId != Program.Data.User.Id)
+                {
+                    Console.WriteLine($"New Message Placed - {message.Content}");
+                }
                 Console.Write("> ");
             });
 

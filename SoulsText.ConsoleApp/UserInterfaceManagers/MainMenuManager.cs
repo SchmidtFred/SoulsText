@@ -28,6 +28,7 @@ namespace SoulsText.ConsoleApp.UserInterfaceManagers
 
                 Console.WriteLine(" 1) User Details");
                 Console.WriteLine(" 2) Messages");
+                Console.WriteLine(" 3) Write Message");
                 Console.WriteLine(" 0) Exit");
 
                 Console.Write("> ");
@@ -38,6 +39,8 @@ namespace SoulsText.ConsoleApp.UserInterfaceManagers
                         return new UserProfileManager(this, API_URL);
                     case "2":
                         return new MessageManager(this);
+                    case "3":
+                        return new WriteMessageManager(this);
                     case "0":
                         Console.WriteLine("Now Exiting App");
                         return null;

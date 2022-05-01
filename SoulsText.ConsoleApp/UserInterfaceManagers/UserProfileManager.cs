@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using SoulsText.ConsoleApp.UserInterfaceManagers;
 using SoulsText.ConsoleApp.Models;
 using Microsoft.AspNetCore.SignalR.Client;
 
