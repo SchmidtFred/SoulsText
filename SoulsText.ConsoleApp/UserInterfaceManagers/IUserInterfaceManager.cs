@@ -3,5 +3,6 @@
     public interface IUserInterfaceManager
     {
         public IUserInterfaceManager Execute();
+        public IUserInterfaceManager ParentUi { get; }
     }
 }

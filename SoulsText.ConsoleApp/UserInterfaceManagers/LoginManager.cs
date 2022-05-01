@@ -11,6 +11,7 @@ namespace SoulsText.ConsoleApp.UserInterfaceManagers
     {
         private readonly InMemoryData _data;
         private readonly HubConnection _connection;
+        public IUserInterfaceManager ParentUi { get { return null; } }
 
         public LoginManager()
         {

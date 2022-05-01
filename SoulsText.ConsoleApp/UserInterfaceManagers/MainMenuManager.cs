@@ -10,6 +10,7 @@ namespace SoulsText.ConsoleApp.UserInterfaceManagers
         private const string API_URL = @"https://localhost:5001/api";
         private readonly InMemoryData _data;
         private readonly HubConnection _connection;
+        public IUserInterfaceManager ParentUi { get { return null; } }
 
         public MainMenuManager()
         {
@@ -36,8 +37,7 @@ namespace SoulsText.ConsoleApp.UserInterfaceManagers
                     case "1":
                         return new UserProfileManager(this, API_URL);
                     case "2":
-                        Console.WriteLine("Not implemented");
-                        return this;
+                        return new MessageManager(this);
                     case "0":
                         Console.WriteLine("Now Exiting App");
                         return null;

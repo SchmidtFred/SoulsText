@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
 using SoulsText.ConsoleApp.Models;
+using SoulsText.ConsoleApp.UserInterfaceManagers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,16 +29,27 @@ namespace SoulsText.ConsoleApp
                 if (Program.Data.Users.Any(p => p.Id == profile.Id))
                 {
                     Console.WriteLine($"{profile.UserName} has logged on.");
+                    Console.Write("> ");
                 }
                 else
                 {
                     Program.Data.Users.Add(profile);
                     Console.WriteLine($"New User {profile.UserName} has registered with SoulsText.");
+                    Console.Write("> ");
                 }
             });
 
             //Add newly registered user to our data when registerd from this connection.
             connection.On<UserProfile>("UserRegistered", profile => Program.Data.User = profile);
+
+            //Add update data to include new message. Rerender MessageManager if it is active
+            connection.On<Message>("ReceiveNewMessage", message =>
+            {
+                //update data
+                Program.Data.Messages.Add(message);
+                Console.WriteLine($"New Message Placed - {message.Content}");
+                Console.Write("> ");
+            });
 
 
             //start connection

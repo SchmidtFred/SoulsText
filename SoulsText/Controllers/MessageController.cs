@@ -48,7 +48,7 @@ namespace SoulsText.Controllers
         public async Task<JsonResult> Post([FromBody] Message message)
         {
             _messageRepository.Add(message);
-            await _hubContext.Clients.All.SendAsync("ReceiveMessage", message);
+            await _hubContext.Clients.All.SendAsync("ReceiveNewMessage", message);
             return Json(message);
         }
 
