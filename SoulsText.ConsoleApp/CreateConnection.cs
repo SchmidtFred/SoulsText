@@ -55,6 +55,13 @@ namespace SoulsText.ConsoleApp
                 Console.Write("> ");
             });
 
+            //update appropriate message with votes
+            connection.On<Message>("ReceiveUpdatedMessage", message =>
+            {
+                var index = Program.Data.Messages.FindIndex(m => m.Id == message.Id);
+                Program.Data.Messages[index] = message;
+            });
+
 
             //start connection
             await connection.StartAsync();

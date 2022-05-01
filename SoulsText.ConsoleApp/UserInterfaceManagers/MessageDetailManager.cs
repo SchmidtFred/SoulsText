@@ -12,26 +12,32 @@ namespace SoulsText.ConsoleApp.UserInterfaceManagers
         private readonly IUserInterfaceManager _parentUI;
         private readonly HubConnection _connection;
         private readonly InMemoryData _data;
-        private readonly Message _message;
+        private readonly int _messageId;
         public IUserInterfaceManager ParentUi { get { return _parentUI; } }
 
-        public MessageDetailManager(IUserInterfaceManager parentUI, Message message)
+        public MessageDetailManager(IUserInterfaceManager parentUI, int messageId)
         {
             _parentUI = parentUI;
             _connection = Program.Connection;
             _data = Program.Data;
-            _message = message;
+            _messageId = messageId;
         }
 
         public IUserInterfaceManager Execute()
         {
+            return Run().Result;
+        }
+
+        private async Task<IUserInterfaceManager> Run()
+        {
+            Message message = _data.Messages.FirstOrDefault(m => m.Id == _messageId);
             Console.WriteLine("Message Details");
-            Console.WriteLine($@"Content: {_message.Content}
-Placed By {_message.UserProfile.UserName}
-X: {_message.X}
-Y: {_message.Y}
-Z: {_message.Z}
-VoteCount: {_message.VoteCount}");
+            Console.WriteLine($@"Content: {message.Content}
+Placed By {message.UserProfile.UserName}
+X: {message.X}
+Y: {message.Y}
+Z: {message.Z}
+VoteCount: {message.VoteCount}");
             Console.WriteLine(" 1) Upvote");
             Console.WriteLine(" 2) Downvote");
             Console.WriteLine(" 0) Go Back");
@@ -40,10 +46,26 @@ VoteCount: {_message.VoteCount}");
             switch (input)
             {
                 case "1":
-                    //do an upvote
+                    //create vote object
+                    Vote vote = new Vote()
+                    {
+                        Upvote = true,
+                        MessageId = message.Id,
+                        UserProfileId = _data.User.Id
+                    };
+                    //send it off
+                    await _connection.InvokeAsync("SendVote", vote);
+                    Console.WriteLine("Upvote Sent");
                     return this;
                 case "2":
-                    //do a downvote
+                    vote = new Vote()
+                    {
+                        Upvote = false,
+                        MessageId = message.Id,
+                        UserProfileId = _data.User.Id
+                    };
+                    await _connection.InvokeAsync("SendVote", vote);
+                    Console.WriteLine("Downvote Sent");
                     return this;
                 case "0":
                     return _parentUI;

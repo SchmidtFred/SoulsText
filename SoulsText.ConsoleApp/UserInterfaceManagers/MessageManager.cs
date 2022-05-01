@@ -37,13 +37,14 @@ namespace SoulsText.ConsoleApp.UserInterfaceManagers
             }
             if (int.TryParse(choice, out int id))
             {
+                //make sure the message exists
                 var chosenMessage = _data.Messages.FirstOrDefault(message => message.Id == id);
                 if (chosenMessage == null)
                 {
                     Console.WriteLine("Message does not exist");
                     return _parentUi;
                 }
-                return new MessageDetailManager(this, chosenMessage);
+                return new MessageDetailManager(this, chosenMessage.Id);
             }
             else
             {
