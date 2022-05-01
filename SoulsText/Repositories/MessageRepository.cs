@@ -234,6 +234,9 @@ namespace SoulsText.Repositories
                 if (v.Upvote)
                 {
                     message.VoteCount++;
+                } else
+                {
+                    message.VoteCount--;
                 }
             });
         }
