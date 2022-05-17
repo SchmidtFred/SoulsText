@@ -1,4 +1,4 @@
-﻿USE [master]
+USE [master]
 GO
 
 IF db_id('SoulsText') IS NULL
@@ -8,9 +8,9 @@ GO
 USE [SoulsText]
 GO
 
-DROP TABLE IF EXISTS UserProfile;
-DROP TABLE IF EXISTS [Message];
 DROP TABLE IF EXISTS Vote;
+DROP TABLE IF EXISTS [Message];
+DROP TABLE IF EXISTS UserProfile;
 GO
 
 CREATE TABLE UserProfile (
@@ -32,7 +32,7 @@ CREATE TABLE [Message] (
 CREATE TABLE Vote (
 	Id INTEGER NOT NULL PRIMARY KEY IDENTITY,
 	Upvote BIT NOT NULL DEFAULT 0,
-	UserProfileId INTEGER NOT NULL,
+	UserProfileId INTEGER,
 	MessageId INTEGER NOT NULL
 
 	CONSTRAINT [FK_Vote_UserProfile] FOREIGN KEY (UserProfileId) REFERENCES [UserProfile] ([Id]) ON DELETE NO ACTION,
