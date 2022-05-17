@@ -39,6 +39,11 @@ namespace SoulsText
             });
 
             services.AddSignalR();
+            services.AddTransient(provider => {
+                var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
+                const string categoryName = "Any";
+                return loggerFactory.CreateLogger(categoryName);
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Logging;
 using SoulsText.Hubs;
 using SoulsText.Models;
 using SoulsText.Repositories;
@@ -13,16 +14,21 @@ namespace SoulsText.Controllers
     {
         private readonly IMessageRepository _messageRepository;
         private readonly IHubContext<SoulsHub> _hubContext;
+        //the logger here is more for testing purposes as I learn how to use logging. Will do full implementation in the Hubs.
+        private readonly ILogger<MessageController> _logger;
 
-        public MessageController(IMessageRepository messageRepository, IHubContext<SoulsHub> hubContext)
+        public MessageController(IMessageRepository messageRepository, IHubContext<SoulsHub> hubContext, ILogger<MessageController> logger)
         {
             _messageRepository = messageRepository;
             _hubContext = hubContext;
+            _logger = logger;
         }
 
         [HttpGet]
         public JsonResult Get()
         {
+            _logger.LogInformation("Getting all messages...");
+
             return Json(_messageRepository.GetAll());
         }
 

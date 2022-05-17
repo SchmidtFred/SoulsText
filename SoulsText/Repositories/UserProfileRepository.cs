@@ -3,35 +3,48 @@ using Microsoft.Data.SqlClient;
 using System.Collections.Generic;
 using SoulsText.Utils;
 using SoulsText.Models;
+using Microsoft.Extensions.Logging;
+using System;
 
 namespace SoulsText.Repositories
 {
     public class UserProfileRepository : BaseRepository, IUserProfileRepository
     {
-        public UserProfileRepository(IConfiguration configuration) : base(configuration) { }
+        private readonly ILogger _logger;
+        public UserProfileRepository(IConfiguration configuration, ILogger logger) : base(configuration) { 
+            _logger = logger;
+        }
 
         public List<UserProfile> GetAll()
         {
-            using (var conn = Connection)
+            _logger.LogInformation("Getting All Users");
+            try
             {
-                conn.Open();
-                using (var cmd = conn.CreateCommand())
+                using (var conn = Connection)
                 {
-                    cmd.CommandText = @"
+                    conn.Open();
+                    using (var cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"
                             SELECT Id, [UserName]
                               FROM UserProfile";
 
-                    List<UserProfile> profiles = new List<UserProfile>();
+                        List<UserProfile> profiles = new List<UserProfile>();
 
-                    var reader = cmd.ExecuteReader();
-                    while (reader.Read())
-                    {
-                        profiles.Add(ProfileFromReader(reader));
+                        var reader = cmd.ExecuteReader();
+                        while (reader.Read())
+                        {
+                            profiles.Add(ProfileFromReader(reader));
+                        }
+                        reader.Close();
+
+                        return profiles;
                     }
-                    reader.Close();
-
-                    return profiles;
                 }
+            } catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Something went wrong when attempting to get all users");
+                throw;
             }
         }
 
@@ -64,19 +77,27 @@ namespace SoulsText.Repositories
 
         public void Add(UserProfile profile)
         {
-            using (var conn = Connection)
+            _logger.LogInformation("Adding New User");
+            try
             {
-                conn.Open();
-                using (var cmd = conn.CreateCommand())
+                using (var conn = Connection)
                 {
-                    cmd.CommandText = @"
+                    conn.Open();
+                    using (var cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"
                             INSERT INTO UserProfile ([UserName])
                             OUTPUT INSERTED.Id
                             VALUES (@userName)";
-                    DbUtils.AddParameter(cmd, "@userName", profile.UserName);
+                        DbUtils.AddParameter(cmd, "@userName", profile.UserName);
 
-                    profile.Id = (int)cmd.ExecuteScalar();
+                        profile.Id = (int)cmd.ExecuteScalar();
+                    }
                 }
+            } catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Something went wrong when attempting to add new user");
+                throw;
             }
         }
 

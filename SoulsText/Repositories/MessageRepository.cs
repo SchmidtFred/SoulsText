@@ -4,114 +4,143 @@ using System.Collections.Generic;
 using System.Linq;
 using SoulsText.Utils;
 using SoulsText.Models;
+using Microsoft.Extensions.Logging;
+using System;
 
 namespace SoulsText.Repositories
 {
     public class MessageRepository : BaseRepository, IMessageRepository
     {
-        public MessageRepository(IConfiguration configuration) : base(configuration) { }
+        private readonly ILogger<MessageRepository> _logger;
+        public MessageRepository(IConfiguration configuration, ILogger<MessageRepository> logger) : base(configuration) {
+            _logger = logger;
+        }
 
         public List<Message> GetAll()
         {
-            using (var conn = Connection)
+            _logger.LogInformation("Getting All Messages");
+            try
             {
-                conn.Open();
-                using (var cmd = conn.CreateCommand())
+                using (var conn = Connection)
                 {
-                    cmd.CommandText = MessageQuery;
-
-                    var messages = new List<Message>();
-
-                    var reader = cmd.ExecuteReader();
-                    while (reader.Read())
+                    conn.Open();
+                    using (var cmd = conn.CreateCommand())
                     {
-                        var messageId = DbUtils.GetInt(reader, "MessageId");
+                        cmd.CommandText = MessageQuery;
 
-                        var existingMessage = messages.FirstOrDefault(m => m.Id == messageId);
-                        if (existingMessage == null)
+                        var messages = new List<Message>();
+
+                        var reader = cmd.ExecuteReader();
+                        while (reader.Read())
                         {
-                            existingMessage = MessageFromReader(reader);
-                            existingMessage.UserProfile = ProfileFromReader(reader);
-                            existingMessage.Votes = new List<Vote>();
+                            var messageId = DbUtils.GetInt(reader, "MessageId");
 
-                            messages.Add(existingMessage);
+                            var existingMessage = messages.FirstOrDefault(m => m.Id == messageId);
+                            if (existingMessage == null)
+                            {
+                                existingMessage = MessageFromReader(reader);
+                                existingMessage.UserProfile = ProfileFromReader(reader);
+                                existingMessage.Votes = new List<Vote>();
+
+                                messages.Add(existingMessage);
+                            }
+
+                            if (DbUtils.IsNotDbNull(reader, "VoteId"))
+                            {
+                                existingMessage.Votes.Add(VoteFromReader(reader));
+                            }
+
                         }
 
-                        if (DbUtils.IsNotDbNull(reader, "VoteId"))
-                        {
-                            existingMessage.Votes.Add(VoteFromReader(reader));
-                        }
+                        reader.Close();
+                        //set vote counts
+                        messages.ForEach(m => SetVoteCount(m));
 
+                        return messages;
                     }
-
-                    reader.Close();
-                    //set vote counts
-                    messages.ForEach(m => SetVoteCount(m));
-
-                    return messages;
                 }
+            } catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Something went wrong when getting all messages.");
+                throw;
             }
         }
 
         public Message GetById(int id)
         {
-            using (var conn = Connection)
+            _logger.LogInformation($"Getting Message - ID: {id} - By Id");
+            try
             {
-                conn.Open();
-                using (var cmd = conn.CreateCommand())
+                using (var conn = Connection)
                 {
-                    cmd.CommandText = MessageQuery + " WHERE m.Id = @id";
-
-                    DbUtils.AddParameter(cmd, "@id", id);
-
-                    Message message = null;
-                    var reader = cmd.ExecuteReader();
-
-                    while (reader.Read())
+                    conn.Open();
+                    using (var cmd = conn.CreateCommand())
                     {
-                        if (message == null)
+                        cmd.CommandText = MessageQuery + " WHERE m.Id = @id";
+
+                        DbUtils.AddParameter(cmd, "@id", id);
+
+                        Message message = null;
+                        var reader = cmd.ExecuteReader();
+
+                        while (reader.Read())
                         {
-                            message = MessageFromReader(reader);
-                            message.UserProfile = ProfileFromReader(reader);
-                            message.Votes = new List<Vote>();
+                            if (message == null)
+                            {
+                                message = MessageFromReader(reader);
+                                message.UserProfile = ProfileFromReader(reader);
+                                message.Votes = new List<Vote>();
+                            }
+
+                            if (DbUtils.IsNotDbNull(reader, "VoteId"))
+                            {
+                                message.Votes.Add(VoteFromReader(reader));
+                            }
                         }
 
-                        if (DbUtils.IsNotDbNull(reader, "VoteId"))
-                        {
-                            message.Votes.Add(VoteFromReader(reader));
-                        }
+                        reader.Close();
+
+                        //make sure we set the vote count
+                        SetVoteCount(message);
+
+                        return message;
                     }
-
-                    reader.Close();
-
-                    //make sure we set the vote count
-                   SetVoteCount(message);
-
-                    return message;
                 }
+            } catch (Exception ex)
+            {
+                _logger.LogWarning(ex, $"Something went wrong when getting Message - ID: {id}");
+                throw;
             }
         }
 
         public void Add(Message message)
         {
-            using (var conn = Connection)
+            _logger.LogInformation($"User - ID: {message.UserProfileId} - Adding Message To Database");
+            try
             {
-                conn.Open();
-                using (var cmd = conn.CreateCommand())
+                using (var conn = Connection)
                 {
-                    cmd.CommandText = @"
+                    conn.Open();
+                    using (var cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"
                             INSERT INTO Message (Content, X, Y, Z, UserProfileId)
                             OUTPUT INSERTED.Id
                             VALUES (@content, @x, @y, @z, @userProfileId)";
 
-                    DbUtils.AddParameter(cmd, "@content", message.Content);
-                    DbUtils.AddParameter(cmd, "@x", message.X);
-                    DbUtils.AddParameter(cmd, "@y", message.Y);
-                    DbUtils.AddParameter(cmd, "@z", message.Z);
-                    DbUtils.AddParameter(cmd, "@userProfileId", message.UserProfileId);
+                        DbUtils.AddParameter(cmd, "@content", message.Content);
+                        DbUtils.AddParameter(cmd, "@x", message.X);
+                        DbUtils.AddParameter(cmd, "@y", message.Y);
+                        DbUtils.AddParameter(cmd, "@z", message.Z);
+                        DbUtils.AddParameter(cmd, "@userProfileId", message.UserProfileId);
 
-                    message.Id = (int)cmd.ExecuteScalar();
+                        message.Id = (int)cmd.ExecuteScalar();
+                    }
                 }
+            } catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Something went wrong when attempting to add message");
+                throw;
             }
         }
 
