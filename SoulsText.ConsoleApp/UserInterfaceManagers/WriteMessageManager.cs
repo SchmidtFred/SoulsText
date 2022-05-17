@@ -21,7 +21,7 @@ namespace SoulsText.ConsoleApp.UserInterfaceManagers
 
         public IUserInterfaceManager Execute()
         {
-            //using this way to allow
+            //using this way to allow us to use async functionality
             return Run().Result;
         }
 

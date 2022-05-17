@@ -39,10 +39,10 @@ namespace SoulsText.ConsoleApp
                 }
             });
 
-            //Add newly registered user to our data when registerd from this connection.
+            //Add newly registered user to our data when registered from this connection.
             connection.On<UserProfile>("UserRegistered", profile => Program.Data.User = profile);
 
-            //Add update data to include new message. Rerender MessageManager if it is active
+            //Add update data to include new message.
             connection.On<Message>("ReceiveNewMessage", message =>
             {
                 //update data
