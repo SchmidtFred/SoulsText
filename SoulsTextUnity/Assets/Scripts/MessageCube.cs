@@ -9,31 +9,31 @@ public class MessageCube : MonoBehaviour
     Transform cube;
 
     [SerializeField]
-    UiText uiText;
+    public UiText uiText;
 
     [SerializeField]
     Transform parent;
 
     [SerializeField]
-    float x = 0;
+    public float X = 0;
 
     [SerializeField]
-    float y = 0;
+    public float Y = 0;
 
     [SerializeField]
-    float z = 0;
+    public float Z = 0;
 
     [SerializeField]
-    string message = "";
+    public string Message = "";
 
     [SerializeField]
-    int voteCount = 0;
+    int VoteCount = 0;
 
     // Start is called before the first frame update
     void Start()
     {
         transform.SetParent(parent);
-        transform.localPosition = new Vector3(x, y, z);
+        transform.localPosition = new Vector3(X, Y, Z);
     }
 
     // Update is called once per frame
@@ -45,7 +45,7 @@ public class MessageCube : MonoBehaviour
     //Put message up when hovering
     private void OnMouseOver()
     {
-        uiText.SetUiText(message);
+        uiText.SetUiText(Message);
     }
 
     //No longer putting up message
