@@ -76,6 +76,7 @@ public class MessageMenu : MonoBehaviour
             cube.Z = float.Parse(string.IsNullOrWhiteSpace(Z.text) ? "0" : Z.text);
             cube.Message = Message.text;
             cube.uiText = cubeParent.UiText;
+            cubeParent.cubes.Add(cube);
         }
     }
 }

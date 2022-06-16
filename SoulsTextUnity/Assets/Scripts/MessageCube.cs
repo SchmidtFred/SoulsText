@@ -29,6 +29,12 @@ public class MessageCube : MonoBehaviour
     [SerializeField]
     int VoteCount = 0;
 
+    [SerializeField]
+    public int UserProfileId = 0;
+
+    [SerializeField]
+    public UserProfile UserProfile;
+
     // Start is called before the first frame update
     void Start()
     {
